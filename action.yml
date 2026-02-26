@@ -1,0 +1,22 @@
+name: 'YAML-JSON'
+author: 'Kai Kimera <mail@kaikim.ru>'
+description: ''
+branding:
+  icon: 'copy'
+  color: 'gray-dark'
+inputs:
+  dir:
+    description: 'YAML directory path'
+    required: true
+runs:
+  using: 'composite'
+  steps:
+    - name: 'Install YQ'
+      shell: bash
+      continue-on-error: true
+      run: |
+        if ! command -v 'yq' &> '/dev/null'; then apt update; apt install yq; fi
+    - name: 'Parse to JSON'
+      shell: bash
+      run: |
+        for i in ${{ inputs.dir }}/*.yml; do yq -p 'yaml' -o 'json' -I 0 "${i}" > "${i%.*}.json"; done
